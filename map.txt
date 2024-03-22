@@ -1,0 +1,131 @@
+// import React, { useEffect, useRef } from "react";
+
+// const GoogleMap = ({ venueAddress }) => {
+//     const mapRef = useRef(null);
+
+//     useEffect(() => {
+//         let map;
+//         const geocoder = new window.google.maps.Geocoder();
+
+//         const loadMap = () => {
+//             map = new window.google.maps.Map(mapRef.current, {
+//                 center: { lat: 0, lng: 0 },
+//                 zoom: 8,
+//             });
+
+//             geocoder.geocode({ address: venueAddress }, (results, status) => {
+//                 if (status === window.google.maps.GeocoderStatus.OK) {
+//                     const location = results[0].geometry.location;
+//                     new window.google.maps.Marker({
+//                         position: location,
+//                         map: map,
+//                     });
+//                     map.setCenter(location);
+//                 } else {
+//                     console.error(
+//                         "Geocode was not successful for the following reason:",
+//                         status
+//                     );
+//                 }
+//             });
+//         };
+
+//         const loadGoogleMapsAPI = () => {
+//             const script = document.createElement("script");
+//             script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDSY2XCLNlF2cjGOe9voCUKE51m5kpI22E&callback=initMap`;
+//             script.async = true;
+//             script.defer = true;
+
+//             window.initMap = () => {
+//                 loadMap();
+//             };
+
+//             script.addEventListener("load", () => {
+//                 document.head.removeChild(script);
+//             });
+
+//             document.head.appendChild(script);
+//         };
+
+//         if (window.google && window.google.maps) {
+//             loadMap();
+//         } else {
+//             loadGoogleMapsAPI();
+//         }
+
+//         return () => {
+//             // Cleanup the map when the component is unmounted
+//             if (
+//                 window.google &&
+//                 window.google.maps &&
+//                 window.google.maps.event
+//             ) {
+//                 window.google.maps.event.clearListeners(map, "idle");
+//             }
+//         };
+//     }, [venueAddress]);
+
+//     return <div ref={mapRef} id="map" style={{ height: "400px" }}></div>;
+// };
+
+// export default GoogleMap;
+
+import React, { useEffect } from "react";
+
+const GoogleMap = ({ venueAddress }) => {
+    useEffect(() => {
+        // Load the Google Maps API
+        const loadGoogleMapsAPI = () => {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement("script");
+                script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDSY2XCLNlF2cjGOe9voCUKE51m5kpI22E&callback=initMap`;
+                script.async = true;
+                script.defer = true;
+                document.head.appendChild(script);
+
+                window.initMap = () => {
+                    // Initialize the map
+                    const map = new window.google.maps.Map(
+                        document.getElementById("map"),
+                        {
+                            center: { lat: 0, lng: 0 }, // Set the initial center of the map
+                            zoom: 8, // Set the initial zoom level of the map
+                        }
+                    );
+
+                    // Create a marker for the venue address
+                    const geocoder = new window.google.maps.Geocoder();
+                    geocoder.geocode(
+                        { address: venueAddress },
+                        (results, status) => {
+                            if (
+                                status === window.google.maps.GeocoderStatus.OK
+                            ) {
+                                const location = results[0].geometry.location;
+                                new window.google.maps.Marker({
+                                    position: location,
+                                    map: map,
+                                });
+                                map.setCenter(location); // Center the map on the marker
+                            } else {
+                                console.error(
+                                    "Geocode was not successful for the following reason:",
+                                    status
+                                );
+                            }
+                        }
+                    );
+                };
+
+                script.onload = resolve;
+                script.onerror = reject;
+            });
+        };
+
+        loadGoogleMapsAPI();
+    }, [venueAddress]);
+
+    return <div id="map" style={{ height: "400px" }}></div>;
+};
+
+export default GoogleMap;
