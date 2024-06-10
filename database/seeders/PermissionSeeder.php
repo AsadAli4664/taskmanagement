@@ -20,7 +20,7 @@ class PermissionSeeder extends Seeder
         Permission::create(['name' => 'edit_users']);
         Permission::create(['name' => 'delete_users']);
         Permission::create(['name' => 'view_users']);
-        Permission::create(['name' => 'create_task']);
+        Permission::create(['name' => 'add_criminal_record']);
         Permission::create(['name' => 'edit_task']);
         Permission::create(['name' => 'delete_task']);
         Permission::create(['name' => 'view_task']);

@@ -10,12 +10,16 @@ class Task extends Model
     use HasFactory;
     protected $table = 'task';
     protected $fillable = [
+        'crime_no',
+        'crime_section',
+        'criminal_address',
+        'arrest_date',
+        'remand',
         'title',
-        'description',
-        'duedate',
-        'priority',
-        // 'project',
-        'assigned_to',
+        'arrest_by',
+        'designation',
+        'condition',
+        'arrest_status',
         // Add other attributes as needed
         'created_by',
     ];

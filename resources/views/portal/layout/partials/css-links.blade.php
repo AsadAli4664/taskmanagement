@@ -32,20 +32,55 @@
 <!-- Bootstrap Slider -->
 <link rel="stylesheet" href="{{url('/portal')}}/plugins/bootstrap-slider/css/bootstrap-slider.min.css">
 
-<!--mycss--->
+
+<!--mycss urdu--->
+<link rel="stylesheet" href="{{url('/portal')}}/plugins/urdu/style.css">
 
 
 
   <!---andmycss js-->
 
 <style type="text/css">
+     body {
+            font-family: 'Noto Nastaliq Urdu', 'Montserrat', sans-serif;
+            /* direction: rtl; */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .center-table th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+        table, th, td {
+            border: 1px solid black;
+          
+        }
+        .center-middle {
+    text-align: center;
+    vertical-align: middle;
+}
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+        
     form label.required:after
     {
         color: red;
         content: " *";
     }
 
-    .nowrap
+    /* .nowrap
     {
         white-space: nowrap;
     }
@@ -62,7 +97,7 @@
         right: -20px;
         z-index:999;
         cursor: pointer;
-    }
+    } */
 
     /*  total duration css after filter  */
     .clock-day:before {

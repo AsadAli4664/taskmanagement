@@ -35,6 +35,7 @@
 <script src="{{url('/portal')}}/plugins/bootstrap-slider/bootstrap-slider.min.js"></script>
 <!-- jQuery Knob -->
 <script src="{{url('/portal')}}/plugins/jquery-knob/jquery.knob.min.js"></script>
+<script src="{{url('/portal')}}/plugins/urdu/urdutextbox.js"></script>
 
 <!-- Highcharts -->
 <script src="{{url('/portal')}}/plugins/highcharts-11.2.0/highcharts.js"></script>

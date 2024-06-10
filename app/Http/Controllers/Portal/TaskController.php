@@ -10,6 +10,7 @@ use App\Models\Project;
 use App\Models\TaskAssignment;
 use App\Models\SubTask;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TaskCreated;
 
@@ -19,53 +20,54 @@ class TaskController extends Controller
     public function index()
 
     {
-        $permissionResult = check_permission('view_task');
+        $permissionResult = check_permission('view_criminal_record');
         if ($permissionResult instanceof \Illuminate\Http\RedirectResponse) {
             return $permissionResult;
         }
         $userId = auth()->user()->id;
         $projects = Project::all();
         $users = User::all();
-        $userassign = User::where("unit_id", $userId)->get();
+     
         $tasks = Task::orderBy('created_at', 'desc')->get();
+        $tasksd = Task::orderBy('created_at', 'desc')->get();
 
 
-        $tasksa = DB::select("
-    (
-        SELECT DISTINCT task_id
-        FROM (
-            SELECT 
-                task_id, 
-                FIND_IN_SET('$userId', REPLACE(REPLACE(REPLACE(collaborators, '\"', ''), '[', ''), ']', '')) AS collab 
-            FROM 
-                task_assignment
-        ) AS res 
-        WHERE 
-            collab > 0
-    )
-    UNION
-    (
-        SELECT DISTINCT id
-        FROM task
-        WHERE assigned_to = '$userId' OR created_by = '$userId'
-    )
-");
-
-
-        // Extract task IDs from the result of the raw SQL query
-        $taskIdsFromSQL = array_column($tasksa, 'task_id');
+       
 
         // Use the extracted task IDs in the whereIn condition
-        $usertask = Task::whereIn("id", $taskIdsFromSQL)->orderBy('created_at', 'desc')->get();
+        $usertask = Task::orderBy('created_at', 'desc')->get();
         // $isValid = 0; // Initialize $isValid as false (indicating invalid)
 
-        return view('portal.task.index', compact('projects', 'users', 'userassign', 'tasks', 'usertask'));
+        return view('portal.task.index', compact('projects', 'users', 'tasks', 'usertask', 'tasksd'));
     }
+
+    public function searchTasks(Request $request)
+    {
+        $tasksQuery = Task::query();
+    
+        if ($request->has('crime_no') && !empty($request->crime_no)) {
+            $tasksQuery->where('crime_no', $request->crime_no);
+        }
+    
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $startDate = Carbon::parse($request->start_date)->startOfDay();
+            $endDate = Carbon::parse($request->end_date)->endOfDay();
+            $tasksQuery->whereBetween('created_at', [$startDate, $endDate]);
+        }
+    
+        $tasks = $tasksQuery->get();
+    
+        return response()->json($tasks);
+    }
+    
+    
+    
+    
 
     public function assignedtask()
 
     {
-        $permissionResult = check_permission('view_task');
+        $permissionResult = check_permission('view_criminal_record');
         if ($permissionResult instanceof \Illuminate\Http\RedirectResponse) {
             return $permissionResult;
         }
@@ -74,35 +76,9 @@ class TaskController extends Controller
         $users = User::all();
         $userassign = User::where("unit_id", $userId)->get();
         $tasks = Task::orderBy('created_at', 'desc')->get();
+        $usertask = Task::orderBy('created_at', 'desc')->get();
 
 
-        $tasksa = DB::select("
-    (
-        SELECT DISTINCT task_id
-        FROM (
-            SELECT 
-                task_id, 
-                FIND_IN_SET('$userId', REPLACE(REPLACE(REPLACE(collaborators, '\"', ''), '[', ''), ']', '')) AS collab 
-            FROM 
-                task_assignment
-        ) AS res 
-        WHERE 
-            collab > 0
-    )
-    UNION
-    (
-        SELECT DISTINCT id
-        FROM task
-        WHERE assigned_to = '$userId'
-    )
-");
-
-
-        // Extract task IDs from the result of the raw SQL query
-        $taskIdsFromSQL = array_column($tasksa, 'task_id');
-
-        // Use the extracted task IDs in the whereIn condition
-        $usertask = Task::whereIn("id", $taskIdsFromSQL)->orderBy('created_at', 'desc')->get();
 
         return view('portal.task.assignedtask', compact('projects', 'users', 'userassign', 'tasks', 'usertask'));
     }
@@ -110,7 +86,7 @@ class TaskController extends Controller
     public function completed()
     {
 
-        $permissionResult = check_permission('view_task');
+        $permissionResult = check_permission('view_criminal_record');
         if ($permissionResult instanceof \Illuminate\Http\RedirectResponse) {
             return $permissionResult;
         }
@@ -153,7 +129,7 @@ class TaskController extends Controller
     }
     public function incompleted()
     {
-        $permissionResult = check_permission('view_task');
+        $permissionResult = check_permission('view_criminal_record');
         if ($permissionResult instanceof \Illuminate\Http\RedirectResponse) {
             return $permissionResult;
         }
@@ -198,7 +174,7 @@ class TaskController extends Controller
 
     public function add()
     {
-        $permissionResult = check_permission('create_task');
+        $permissionResult = check_permission('add_criminal_record');
         if ($permissionResult instanceof \Illuminate\Http\RedirectResponse) {
             return $permissionResult;
         }
@@ -207,7 +183,7 @@ class TaskController extends Controller
 
     public function edit($id)
     {
-        $permissionResult = check_permission('edit_task');
+        $permissionResult = check_permission('edit_criminal_record');
         if ($permissionResult instanceof \Illuminate\Http\RedirectResponse) {
             return $permissionResult;
         }
@@ -230,12 +206,9 @@ class TaskController extends Controller
 
     public function delete($id)
     {
-        $permissionResult = check_permission('delete_task');
-        if ($permissionResult instanceof \Illuminate\Http\RedirectResponse) {
-            return $permissionResult;
-        }
+     
         $task  = Task::where('id', $id)->delete();
-        return redirect()->route('task.index')->with('success', 'task deleted successfully');
+        return redirect()->route('task.index')->with('success', 'Record deleted successfully');
     }
 
     public function list(Request $request)
@@ -351,32 +324,30 @@ class TaskController extends Controller
     public function store(Request $request)
     {
 
-        $permissionResult = check_permission('create_task');
+        $permissionResult = check_permission('add_criminal_record');
         if ($permissionResult instanceof \Illuminate\Http\RedirectResponse) {
             return $permissionResult;
         }
         $currentDayStart = now()->setTimezone('Asia/Karachi')->startOfDay();
         $request->validate([
-            'title' => 'required',
-            'Description' => 'required',
-            'dueDate' => 'required|after_or_equal:' . $currentDayStart,
-            'priority' => 'required',
-            //'project' => 'required',
-            'assigned_to' => 'required'
-        ], [
-            'dueDate.after_or_equal' => 'The Due Date must not before the current day.',
+            'crime_no' => 'required'
+            
         ]);
 
         // $userEmail = 'A.Ali@psca.gop.pk'; // Replace this with the actual email
         $assigntoid=$request->assigned_to;
         $userEmail = User::whereIn('id', [$assigntoid])->pluck('email');
         $task = new Task([
-            'title' => $request->title,
-            'description' => $request->Description,
-            'duedate' => date('Y-m-d', strtotime($request->dueDate)),
-            'priority' => $request->priority,
-            'project' => $request->project,
-            'assigned_to' => $request->assigned_to,
+            'crime_no' => $request->crime_no,
+            'crime_section' => $request->crime_section,
+            'criminal_address' => $request->criminal_address,
+            'arrest_date' => $request->arrest_date,
+            'remand' => $request->remand,
+            'title' => $request->days,
+            'arrest_by' => $request->arrest_by,
+            'designation' => $request->designation,
+            'condition' => $request->condition,
+            'arrest_status' => $request->arrest_status,
             'created_by' => auth()->user()->id
             // Add other fields as needed
         ]);
@@ -385,72 +356,30 @@ class TaskController extends Controller
         // Save the task to the database
         $task->save();
 
-        $taskAssignment = new TaskAssignment([
-            // 'project_id' => $request->project,
-            'project_id' => 1,
-            "task_id" => $task->id,
-            'collaborators' => json_encode($request->collaborators),
-            // Add other fields as needed
-        ]);
+    
 
-       // Fetching collaborators email
-// Assuming $request->collaborators contains user IDs
-$collaboratorsmail = null; // Initialize the variable
-
-$collaboratorIds = $request->collaborators;
-
-if ($collaboratorIds != '') {
-    // Fetch user emails based on the collaborator IDs
-    $collaboratorname = User::whereIn('id', $collaboratorIds)->pluck('name');
-    $collaboratore = User::whereIn('id', $collaboratorIds)->pluck('email');
-    // Create a new TaskAssignment
-    $collaboratorsmail = new TaskAssignment([
-        'collaborators' => $collaboratorname->toArray(), // Convert collection to array
-        // Add other fields as needed
-    ]);
-    Mail::cc($collaboratore)->send(new TaskCreated($task, $collaboratorsmail));
-}
-
-// Check if $collaboratorsmail is not null before using it
-if ($collaboratorsmail !== null) {
-    Mail::to($userEmail)->send(new TaskCreated($task, $collaboratorsmail));
-} else {
-    // Handle the case when $collaboratorsmail is null, for example, send a different email or handle it accordingly.
-    $nocollab='';
-    Mail::to($userEmail)->send(new TaskCreated($task, $nocollab));
-}
-
-
-        // Assuming TaskCreated constructor accepts a TaskAssignment instance
-
-
-        //end fetching collaborators email
-
-        // Save the task assignment to the database
-        $taskAssignment->save();
-
-        // $isValid = 0; // Initialize $isValid as false (indicating invalid)
-        // return view('task.index', compact('isValid'));
-        return redirect()->route('task.index')->with(['success' => 'task created successfully']);
+        return redirect()->route('task.index')->with(['success' => 'record entered successfully']);
     }
     public function update(Request $request, $id)
     {
-        $permissionResult = check_permission('edit_task');
-        if ($permissionResult instanceof \Illuminate\Http\RedirectResponse) {
-            return $permissionResult;
-        }
+   
         $request->validate([
-            'title' => 'required|max:1000', // Change 'name' to 'title'
-            'duedate' => 'required',
-            'description' => 'required',
+            'crime_no' => 'required|max:1000', // Change 'name' to 'title'
+           
         ]);
         Task::where("id", $id)->update([
-            "title" => $request->title,
-            "duedate" => $request->duedate,
-            "description" => $request->description,
-            "assigned_to" => $request->assigned_to,
+            'crime_no' => $request->crime_no,
+            'crime_section' => $request->crime_section,
+            'criminal_address' => $request->criminal_address,
+            'arrest_date' => $request->arrest_date,
+            'remand' => $request->remand,
+            'title' => $request->days,
+            'arrest_by' => $request->arrest_by,
+            'designation' => $request->designation,
+            'condition' => $request->condition,
+            'arrest_status' => $request->arrest_status,
         ]);
-        return redirect()->route('task.index')->with('success', 'task updated successfully');
+        return redirect()->route('task.index')->with('success', 'record updated successfully');
     }
 
     public function updatecollaborator(Request $request, $id)

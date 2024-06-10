@@ -17,12 +17,9 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->longText('description');
-            $table->date('duedate');
-            $table->string('priority');
-            $table->integer('project');
+          
             $table->integer('created_by');
-            $table->integer('assigned_to');
-            $table->integer('progress')->default(0);
+        
             $table->tinyInteger('is_deleted')->default(0);
             $table->timestamp('deleted_at')->nullable();
             $table->timestamps();

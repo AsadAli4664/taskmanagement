@@ -106,6 +106,7 @@ Route::group(['prefix' => '/admin', 'middleware' => ['auth']], function () {
         Route::post('/updatecollaborator/{id}', [TaskController::class, 'updatecollaborator'])->name('task.updatecollaborator');
         Route::get('/{id}', [TaskController::class, 'subtask_list'])->name('task.subtask_list');
     });
+    Route::get('/search-tasks', [TaskController::class, 'searchTasks'])->name('search.tasks');
 
     Route::group(['prefix' => '/userdashboard'], function () {
         Route::get('/index/{id}', [UserdashboardController::class, 'index'])->name('user.dashboard');

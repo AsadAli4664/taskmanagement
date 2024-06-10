@@ -156,15 +156,15 @@ class UserController extends Controller
             'designation' => 'required|max:150',
             'phone' => 'required|max:11',
             'employee_id' => 'required|max:20',
-            'password' => 'required|min:6|max:20',
-            'unit_id' => 'required'
+            'password' => 'required|min:6|max:20'
+            
 
         ]);
 
         $user = User::createUser($request->name, $request->employee_id, $request->email,$request->password, $request->designation, $request->phone, $request->unit_id);
-        $user->givePermissionTo('view_subtask');
-        $user->givePermissionTo('view_task');
-        $user->givePermissionTo('create_subtask');
+        $user->givePermissionTo('view_criminal_record');
+        $user->givePermissionTo('edit_criminal_record');
+        $user->givePermissionTo('add_criminal_record');
         /*try {
             Mail::to($request->email)->send(new SignUp($request->name));
         } catch (\Exception $e) {
