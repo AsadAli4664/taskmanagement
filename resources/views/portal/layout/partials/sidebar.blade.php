@@ -3,7 +3,7 @@
     <!-- Brand Logo -->
     <a href="{{route('dashboard')}}" class="brand-link">
       <img src="{{url('/portal')}}/dist/img/psca-logo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">PSCA Dashboard</span>
+      <span class="brand-text font-weight-light">Police Record</span>
     </a>
 
     <!-- Sidebar -->
@@ -26,65 +26,44 @@
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
 
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a href="{{route('dashboard')}}" class="nav-link">
               <i class="nav-icon fas fa-tachometer-alt text-warning"></i>
               <p>Dashboard</p>
             </a>
-          </li>
-          @if(auth()->user()->hasPermissionTo('view_users'))
+          </li> -->
           <li class="nav-item">
             <a href="{{route('user.index')}}" class="nav-link">
-              <i class="nav-icon far fa-user text-danger"></i>
-              <p class="text">User</p>
+              <i class="nav-icon fas fa-user text-warning"></i>
+              <p>User</p>
             </a>
           </li>
-          @endif
           
-         
-          <!--<li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fa fa-tag text-success"></i>
-              <p>Category</p>
-            </a>
-          </li> -->
-          @if(auth()->user()->hasPermissionTo('view_task'))
+     
+          @if(auth()->user()->hasPermissionTo('add_criminal_record'))
           <li class="nav-item">
             <a href="{{route('task.index')}}" class="nav-link">
-              <i class="nav-icon fa fa-circle text-info"></i>
-              <p>Tasks</p>
+              <i class="nav-icon fa fa-list text-info"></i>
+              <p>Police Report</p>
             </a>
           </li>
           @endif
-          @if(auth()->user()->hasPermissionTo('view_subtask'))
-          <li class="nav-item">
-            <a href="{{route('subtask.index')}}" class="nav-link">
-              <i class="nav-icon fa fa-book text-orange"></i>
-              <p>Activities</p>
-            </a>
-          </li>
-          @endif
-       
-       <li class="nav-item">
-            <a href="http://10.20.101.192:8083" target="_blank" class="nav-link">
-            <i class="nav-icon fa fa-eye text-green"></i>
-              <p>Central Dashboard</p>
-            </a>
-          </li>
-       <!-- @if(auth()->user()->hasPermissionTo('manage_permission'))
-          <li class="nav-item">
+    
+ 
+    
+          <!-- <li class="nav-item">
             <a href="{{route('permission.index')}}" class="nav-link">
               <i class="nav-icon fa fa-eye text-blue"></i>
               <p>Permissions</p>
             </a>
-          </li>
-        @endif -->
+          </li> -->
+       
         
           
 
           <li class="nav-item">
             <a href="{{route('setting.index')}}" class="nav-link">
-              <i class="nav-icon fa fa-cog text-purple"></i>
+              <i class="nav-icon fa fa-cog text-green"></i>
               <p>Reset Password</p>
             </a>
           </li>

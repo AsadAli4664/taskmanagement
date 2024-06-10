@@ -42,13 +42,9 @@
                     <input type="name" class="form-control" id="designation" name="designation" value="{{ old('designation') }}" required/>
                     <label  class="form-label required">Phone</label>
                     <input type="name" class="form-control" id="phone" name="phone" value="{{ old('phone') }}" required/>
-                    <label  class="form-label required">Reporting Person</label>
+                   
                     
-                        <select name="unit_id" class="form-control">
-                            @foreach($users as $user)
-                          <option value="{{$user->id}}">{{$user->name}} | {{$user->designation}} | {{$user->employee_id}}</option>
-                            @endforeach
-                        </select>
+                     
                   
                     <!-- <input type="name" class="form-control" id="phone" name="phone" value="{{ old('phone') }}" required/> -->
 

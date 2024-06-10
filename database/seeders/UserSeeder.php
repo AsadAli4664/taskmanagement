@@ -33,7 +33,7 @@ class UserSeeder extends Seeder
         $user->givePermissionTo('create_users');
         $user->givePermissionTo('edit_users');
         $user->givePermissionTo('delete_users');
-        $user->givePermissionTo('create_task');
+        $user->givePermissionTo('add_criminal_record');
         $user->givePermissionTo('edit_task');
         $user->givePermissionTo('delete_task');
         $user->givePermissionTo('view_task');
@@ -64,7 +64,7 @@ class UserSeeder extends Seeder
         $user->givePermissionTo('create_users');
         $user->givePermissionTo('edit_users');
         $user->givePermissionTo('delete_users');
-        $user->givePermissionTo('create_task');
+        $user->givePermissionTo('add_criminal_record');
         $user->givePermissionTo('edit_task');
         $user->givePermissionTo('delete_task');
         $user->givePermissionTo('view_task');
@@ -110,7 +110,7 @@ class UserSeeder extends Seeder
          $user->givePermissionTo('create_users');
         $user->givePermissionTo('edit_users');
         $user->givePermissionTo('delete_users');
-        $user->givePermissionTo('create_task');
+        $user->givePermissionTo('add_criminal_record');
         $user->givePermissionTo('edit_task');
         $user->givePermissionTo('delete_task');
         $user->givePermissionTo('view_task');
@@ -138,7 +138,7 @@ class UserSeeder extends Seeder
         $user->givePermissionTo('create_users');
         $user->givePermissionTo('edit_users');
         $user->givePermissionTo('delete_users');
-        $user->givePermissionTo('create_task');
+        $user->givePermissionTo('add_criminal_record');
         $user->givePermissionTo('edit_task');
         $user->givePermissionTo('delete_task');
         $user->givePermissionTo('view_task');

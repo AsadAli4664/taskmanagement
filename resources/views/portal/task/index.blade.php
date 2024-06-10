@@ -1,413 +1,189 @@
 @extends('portal.layout.app')
 
 @section('content')
-
-
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-            <h1>Tasks</h1>
-            
+                <h1>Police Record</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="{{route('dashboard')}}">Home</a></li>
-                    <!-- <li class="breadcrumb-item"><a href="#">Projects</a></li> -->
-                    <li class="breadcrumb-item active">Tasks</li>
+                    <li class="breadcrumb-item active">Police Record</li>
                 </ol>
             </div>
         </div>
-    </div><!-- /.container-fluid -->
+    </div>
 </section>
 
 <!-- Main content -->
 <section class="content">
     <!-- Default box -->
-
     <div class="card card-info card-outline">
-
         <div class="card-header d-flex justify-content-end">
-            <!-- <label for="userFilter">Filter by User:</label> -->
-            @if(auth()->user()->hasPermissionTo('view_alltasks'))
-            <select class="form-control d-inline-block col-1 mr-1" id="userFilter">
-                <option value="">Assigned To</option>
-                @foreach($users as $user)
-                <option value="{{ $user->name }} | {{$user->designation}}">{{ $user->name }} | {{$user->designation}}</option>
+            <select class="form-control d-inline-block col-2 mr-1" id="crimeNoFilter">
+                <option value="">Select crime_no</option>
+                @foreach($tasksd as $task)
+                    <option value="{{$task->crime_no}}">{{$task->crime_no}}</option>
                 @endforeach
             </select>
-
-            <select class="form-control d-inline-block col-1 mr-1" id="taskFilter">
-                <option value="">All Tasks</option>
-                @foreach($tasks as $task)
-                <option value="{{ $task->title }}">{{ $task->title }}</option>
-                @endforeach
-            </select>
-            @else
-
+            <div class="form-control d-inline-block col-3 mr-1" id="dateRangePicker">
+                <i class="fa fa-calendar"></i>&nbsp;
+                <span>Select Date Range</span> <i class="fa fa-caret-down"></i>
+            </div>
+            @if(auth()->user()->hasPermissionTo('add_criminal_record'))
+                <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#addTaskModal">
+                    Enter Record
+                </button>
             @endif
-            <select class="form-control d-inline-block col-1 mr-1" id="priorityFilter">
-                <option value="">Priority</option>
-
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-            </select>
-
-            <button type="button" class="btn btn-default  mr-1" id="daterange-btn">
-                <i class="far fa-calendar-alt"></i>
-                <span>Filters</span>
-                <i class="fas fa-caret-down"></i>
-            </button>
-
-            @if(auth()->user()->hasPermissionTo('create_task'))
-            <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#addTaskModal">
-                Add Task
-            </button>
-            @endif
-
-
         </div>
         <div class="card-body">
-            <table class="table table-bordered" id="taskTable">
-                <thead>
+            <table class="table table-bordered center-table" id="taskTable">
+                <thead style="font-size: 18px;">
                     <tr>
-                        <th> Sr. </th>
-                        <th> Title </th>
-                        <th> Due Date </th>
-                        <th style="display: none;"> Description </th>
-                        <th> Priority </th>
-                        <!-- <th> Project </th> -->
-                        <th> Progress </th>
-                        <th> Created At </th>
-                        <th> Assigned to </th>
-                        <th> Assigned by </th>
-                        <th> Actions </th>
+                        <th rowspan="2" style="text-align: center; vertical-align: middle;"> ایکشن </th>
+                        <th rowspan="2" style="text-align: center; vertical-align: middle;">   کیفیت </th>
+                        <th rowspan="2" style="text-align: center; vertical-align: middle;"> آفیسر گرفتار کنندہ </th>
+                        <th colspan="3" style="text-align: center; vertical-align: middle;">  پوزیشن ملزمان </th>
+                        <th rowspan="2" style="text-align: center; vertical-align: middle;"> نام و پتہ ملزمان </th>
+                        <th rowspan="2" style="text-align: center; vertical-align: middle;"> جرم </th>
+                        <th rowspan="2" style="text-align: center; vertical-align: middle;"> مقدمہ معہ تاریخ </th>
+                        <th rowspan="2" style="text-align: center; vertical-align: middle;"> نمبر شمار</th>
+                    </tr>
+                    <tr>
+                        <th style="text-align: center; vertical-align: middle;">  پوزیشن ملزمان </th>
+                        <th style="text-align: center; vertical-align: middle;"> جسمانی ریمانڈ  </th>
+                        <th style="text-align: center; vertical-align: middle;">  تاریخ  گرفتاری </th>
                     </tr>
                 </thead>
                 <tbody>
-
-
-                    @if(auth()->user()->hasPermissionTo('view_alltasks'))
-                    @php
-                    $serialNumber = 1;
-                    @endphp
+                    @php $serialNumber = 1; @endphp
                     @foreach($tasks as $task)
-                    <tr data-user-id="{{$task->task_creator->id}}">
-                        <td>{{$serialNumber++}}</td>
-                        <td> <a href="{{ route('task.subtask_list', ['id' => $task->id]) }}"> {{$task->title}} </a></td>
-                        <td>{{$task->duedate}}</td>
-                        <td style="display: none;">{{$task->description}}</td>
-                        <td>{{$task->priority}}</td>
-                        <td>{{$task->progress}}</td>
-                        <td>{{$task->created_at}}</td>
-                        <td>{{$task->task_manager->name}} | {{$task->task_manager->designation}}</td>
-                        <td>
-                            {{$task->task_creator->name}} | {{$task->task_creator->designation}}
-                        </td>
-                        <td>
-                            <!-- Add actions/buttons for the new column -->
+                        <tr data-user-id="{{$task->task_creator->id}}">
+                            <td>
+                                @can('edit_criminal_record', $task)
+                                    <a href="{{ route('task.edit', ['id' => $task->id]) }}" class="mr-1 text-info" title="Edit"><i class="fa fa-edit"></i> </a>
+                                @endcan
 
-                            @can('add_collaborator', $task)
-                            <a href="{{ route('task.editcollab', ['id' => $task->id]) }}" class="mr-1 text-success" title="Add Collaborartor"><i class="fa fa-plus"></i> </a>
-                            @endcan
-
-                            <a href="{{ route('task.subtask_list', ['id' => $task->id]) }}" class="mr-1 text-blue" title="View"><i class="fa fa-eye"></i> </a>
-                            @can('edit_task', $task)
-                            @if(auth()->user()->id==$task->task_creator->id)
-                            <a href="{{ route('task.edit', ['id' => $task->id]) }}" class="mr-1 text-info" title="Edit"><i class="fa fa-edit"></i> </a>
-                            @endif
-                            @endcan
-
-                            @can('delete_task', $task)
-                            @if(auth()->user()->id==$task->task_creator->id)
-                            <a href="{{ route('task.delete', ['id' => $task->id]) }}" class="mr-1 text-danger delete-task" title="Delete" data-task-id="{{ $task->id }}">
-                                <i class="fa fa-trash"></i>
-                            </a>
-                            @endif
-                            @endcan
-                        </td>
-                    </tr>
+                                @can('delete_criminal_record', $task)
+                                    <a href="{{ route('task.delete', ['id' => $task->id]) }}" class="mr-1 text-danger delete-task" title="Delete" data-task-id="{{ $task->id }}">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                @endcan
+                            </td>
+                            <td>{{$task->condition}}</td>
+                            <td>{{$task->designation}} | {{$task->arrest_by}} </td>
+                            <td>{{$task->arrest_status}}</td>
+                            <td>{{$task->remand}} {{$task->title}}</td>
+                            <td>{{$task->arrest_date}}</td>
+                            <td>{{$task->criminal_address}}</td>
+                            <td>{{$task->crime_section}}</td>
+                            <td>{{$task->crime_no}}</td>
+                            <td>{{$serialNumber++}}</td>
+                        </tr>
                     @endforeach
-                    @else
-                    @php
-                    $serialNumber = 1;
-                    @endphp
-                    @foreach($usertask as $task)
-                    <tr data-user-id="{{$task->task_creator->id}}">
-                        <td>{{$serialNumber++}}</td>
-                        <td> <a href="{{ route('task.subtask_list', ['id' => $task->id]) }}"> {{$task->title}} </a></td>
-                        <td>{{$task->duedate}}</td>
-                        <td style="display: none;">{{$task->description}}</td>
-                        <td>{{$task->priority}}</td>
-                        <td>{{$task->progress}}</td>
-                        <td>{{$task->created_at}}</td>
-                        <td>{{$task->task_manager->name ?? '' }} | {{$task->task_manager->designation ?? ''}}</td>
-                        <td>
-                            {{$task->task_creator->name}} | {{$task->task_creator->designation}}
-                        </td>
-                        <td>
-                            <!-- Add actions/buttons for the new column -->
-                            @can('add_collaborator', $task)
-                            <a href="{{ route('task.editcollab', ['id' => $task->id]) }}" class="mr-1 text-success" title="Add Collaborartor"><i class="fa fa-plus"></i> </a>
-                            @endcan
-                            <a href="{{ route('task.subtask_list', ['id' => $task->id]) }}" class="mr-1 text-blue" title="View"><i class="fa fa-eye"></i> </a>
-                            @can('edit_task', $task)
-                            @if(auth()->user()->id==$task->task_creator->id)
-                            <a href="{{ route('task.edit', ['id' => $task->id]) }}" class="mr-1 text-info" title="Edit"><i class="fa fa-edit"></i> </a>
-                            @endif
-                            @endcan
-
-                            @can('delete_task', $task)
-                            @if(auth()->user()->id==$task->task_creator->id)
-                            <a href="{{ route('task.delete', ['id' => $task->id]) }}" class="mr-1 text-danger delete-task" title="Delete" data-task-id="{{ $task->id }}">
-                                <i class="fa fa-trash"></i>
-                            </a>
-                            @endif
-                            @endcan
-
-                        </td>
-                    </tr>
-                    @endforeach
-                    @endif
-
                 </tbody>
             </table>
         </div>
-        <!-- Role Grant Modal -->
-        <div class="modal fade" id="addTaskModal" tabindex="-1" role="dialog" aria-labelledby="addTaskModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addTaskModalLabel">Add Task</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="{{route('task.store')}}" method="POST">
-
-                        <!-- <form action="{{route('task.store')}}" method="POST" id="addTaskForm" data-isValid="{{--$isValid--}}"> -->
-                            @csrf
-                            <div class="form-group">
-                                <label for="Title">Title*</label>
-                                <input type="text" class="form-control @error('title') is-invalid @enderror" name="title" value="{{ old('title') }}" id="Title" placeholder="Title">
-                                @error('title')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label for="Description">Description*</label>
-                                <textarea class="form-control @error('Description') is-invalid @enderror" rows="3" name="Description" id="Description" placeholder="Description">{{ old('Description') }}</textarea>
-                                @error('Description')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="form-group">
-                                <label for="dueDate">Due Date</label>
-                                <input type="text" class="form-control" name="dueDate" id="dueDate" placeholder="Due Date">
-                            </div>
-                            <div class="form-group">
-                                <label>Priority</label>
-                                <select name="priority" class="form-control">
-                                    <option value="Medium">Medium</option>
-                                    <option value="High">High</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <!--<label>Project</label> -->
-                                <select style="display:none;" name="project" class="form-control">
-                                    @foreach($projects as $project)
-                                    <option value="{{$project->id}}">{{$project->name}} | {{$project->location}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Assigned to</label>
-                                <select name="assigned_to" class="form-control">
-                                    @foreach($userassign as $userassigned)
-                                    <option value="{{$userassigned->id}}">{{$userassigned->name}} | {{$userassigned->designation}} | {{$userassigned->employee_id}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <!-- <label>Collaborators</label> -->
-
-                                <div class="dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="collaboratorDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Select Collaborators
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="collaboratorDropdown">
-                                        @foreach($userassign as $userassigned)
-                                        <div class="dropdown-item">
-                                            <input type="checkbox" name="collaborators[]" value="{{$userassigned->id}}" id="collaborator{{$userassigned->id}}">
-                                            <label for="collaborator{{$userassigned->id}}">{{$userassigned->name}} | {{$userassigned->designation}} | {{$userassigned->employee_id}}</label>
-                                        </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
-
-
-
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary" >Add </button>
-                    </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- /.card-body -->
-        <div class="card-footer clearfix">
-            <div class="d-flex justify-content-center">
-            </div>
-        </div>
     </div>
-    <!-- /.card -->
-
 </section>
 
-@endsection
-
-
-
 @section('script')
-<!-- Ensure to include necessary libraries for DataTables, Date Picker, and Slider -->
-<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
 
 <script>
+    
     $(document).ready(function() {
-        // let isValid  = $("#addTaskForm").attr("data-isValid");
-        // //console.log(">>>>>>>>>>>>>", typeof(isValid))
-        // if(isValid==1){
-        //     //alert(isValid)
-        //     $("#addTaskModal").modal("show");
-        //     //$("#addTaskModal").css("display","block");
+function fetchTasks() {
+    var crimeNo = $('#crimeNoFilter').val();
+    var dateRange = $('#dateRangePicker span').html();
+    var startDate = null;
+    var endDate = null;
 
-        // }
-        // else {
-        //     $("#addTaskModal").modal("hide");
-        // }
+    if (dateRange && dateRange !== 'Select Date Range') {
+        var dates = dateRange.split(' - ');
+        startDate = dates[0];
+        endDate = dates[1];
+    }
 
-        // let isValid= $("#addTaskBtn").on("click", function(){
-            
-        //     $("#addTaskForm").submit();
-        // });
+    $.ajax({
+        url: "{{ route('search.tasks') }}",
+        type: "GET",
+        data: { 
+            crime_no: crimeNo,
+            start_date: startDate,
+            end_date: endDate
+        },
+        success: function(data) {
+            $('#taskTable tbody').empty();
+            var serialNumber = 1;
+            $.each(data, function(index, task) {
+                var editUrl = '{{ route("task.edit", ":id") }}'.replace(':id', task.id);
+                var deleteUrl = '{{ route("task.delete", ":id") }}'.replace(':id', task.id);
 
+                $('#taskTable tbody').append(
+                    `<tr>
+                        <td>
+                            @can('edit_criminal_record', $task)
+                                <a href="` + editUrl + `" class="mr-1 text-info" title="Edit"><i class="fa fa-edit"></i> </a>
+                            @endcan
 
-
-        // Add click event handler for delete buttons with class 'delete-task'
-        $('.delete-task').on('click', function(event) {
-            event.preventDefault(); // Prevent the default behavior (e.g., navigating to the delete URL)
-
-            var taskId = $(this).data('task-id');
-
-            // Show a confirmation alert
-            if (confirm('Are you sure you want to delete this task?')) {
-                // If user clicks 'OK', proceed with the deletion
-                window.location.href = "{{ url('/admin/task/delete') }}/" + taskId;
-            }
-        });
-
-        // Initialize DataTable
-
-        // Initialize DataTable with column-specific options
-        var table = $('#taskTable').DataTable({
-            columnDefs: [{
-                    targets: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-                    orderable: false
-                } // Set orderable to false for all columns except the 1st column
-            ]
-        });
-
-
-
-        // Apply filter when user selects a value from the userFilter dropdown
-        $('#userFilter').on('change', function() {
-            var filterValue = $(this).val();
-            table.column(7).search(filterValue).draw();
-        });
-
-        // DataTables date range filtering function
-        $.fn.dataTable.ext.search.push(
-            function(settings, data, dataIndex, startDatetime, endDatetime) {
-                startDatetime = $('#daterange-btn').data('daterangepicker').startDate.format('YYYY-MM-DD HH:mm:ss');
-                endDatetime = $('#daterange-btn').data('daterangepicker').endDate.format('YYYY-MM-DD HH:mm:ss');
-                var activityCreatedAt = data[6]; // Assuming Activity Created At is in the 8th column
-
-                if ((startDatetime === '' && endDatetime === '') ||
-                    (startDatetime === '' && activityCreatedAt <= endDatetime) ||
-                    (startDatetime <= activityCreatedAt && endDatetime === '') ||
-                    (startDatetime <= activityCreatedAt && activityCreatedAt <= endDatetime)) {
-                    return true;
-                }
-                return false;
-            }
-        );
-
-        // Input event handler for the user search
-        $('#userSearch').on('input', function() {
-            var searchQuery = $(this).val().toLowerCase();
-
-            // Filter the table based on the entered user name
-            $('#taskTable tbody tr').each(function() {
-                var userName = $(this).find('td').eq(8).text().toLowerCase();
-
-                if (userName.includes(searchQuery)) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
+                            @can('delete_criminal_record', $task)
+                                <a href="` + deleteUrl + `" class="mr-1 text-danger delete-task" title="Delete" data-task-id="` + task.id + `">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            @endcan
+                        </td>
+                        <td>` + task.condition + `</td>
+                        <td>` + task.designation + ` | ` + task.arrest_by + `</td>
+                        <td>` + task.arrest_status + `</td>
+                        <td>` + task.remand + ` ` + task.title + `</td>
+                        <td>` + task.arrest_date + `</td>
+                        <td>` + task.criminal_address + `</td>
+                        <td>` + task.crime_section + `</td>
+                        <td>` + task.crime_no + `</td>
+                        <td>` + serialNumber++ + `</td>
+                    </tr>`
+                );
             });
-        });
 
-        // Initialize date pickers
-        $('#daterange-btn').daterangepicker({
-                ranges: {
-                    'Today': [moment().format('DD-MM-YYYY'), moment()],
-                    'Yesterday': [moment().subtract(1, 'days').format('DD-MM-YYYY'), moment().subtract(1, 'days').endOf('day')],
-                    'Last 7 Days': [moment().subtract(6, 'days').format('DD-MM-YYYY'), moment().endOf('day')],
-                    'Last 30 Days': [moment().subtract(29, 'days').format('DD-MM-YYYY'), moment().endOf('day')],
-                    'This Month': [moment().startOf('month').format('DD-MM-YYYY'), moment()],
-                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-                    'All the Time': [moment().startOf('year'), moment()]
-                },
-                startDate: moment().startOf('year'),
-                endDate: moment(),
-                locale: {
-                    format: 'DD-MM-YYYY hh:mm A'
-                },
-                showDropdowns: true,
-                timePicker: true,
+            // Reinitialize DataTables
+            $('#taskTable').DataTable();
+        },
+        error: function() {
+            alert('Error fetching tasks. Please try again.');
+        }
+    });
+}
+
+
+        $('#crimeNoFilter').on('change', fetchTasks);
+
+        $('#dateRangePicker').daterangepicker({
+            ranges: {
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
             },
-            function(start, end) {
-                $("#daterange-btn span").html(start.format('DD-MM-YYYY hh:mm:ss A') + " to " + end.format('DD-MM-YYYY hh:mm:ss A'))
-                table.draw();
-            });
-        // Apply filter when user selects a value from the taskFilter dropdown
-        $('#taskFilter').on('change', function() {
-            var filterValue = $(this).val();
-            table.column(1).search(filterValue).draw();
+            locale: {
+                format: 'YYYY-MM-DD'
+            },
+            startDate: moment().subtract(6, 'days'),
+            endDate: moment()
+        }, function(start, end) {
+            $('#dateRangePicker span').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+            fetchTasks();
         });
-        $('#priorityFilter').on('change', function() {
-            var filterValue = $(this).val();
-            table.column(4).search(filterValue).draw();
-        });
-    });
-</script>
-<script>
-    $(function() {
-        $('#dueDate').daterangepicker({
-            singleDatePicker: true,
-        });
-    });
-</script>
 
+        // Initial fetch
+        $('#dateRangePicker span').html(moment().subtract(6, 'days').format('YYYY-MM-DD') + ' - ' + moment().format('YYYY-MM-DD'));
+        fetchTasks();
+    });
+</script>
+@endsection
 
 @endsection

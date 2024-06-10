@@ -47,7 +47,7 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials)) {
             // Authentication passed...
-            return redirect()->intended('/admin/dashboard');
+            return redirect()->intended('/admin/task');
         }
 
         return redirect()->route('login')->with('error', 'Invalid email or password.');

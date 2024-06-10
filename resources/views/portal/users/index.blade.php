@@ -103,7 +103,7 @@
                     render: function (data, type, row) {
                     // Include the "id" in the href link
                    // Include the "id" in the href link
-                <?php  if(auth()->user()->hasPermissionTo('view_userdashboard')){ ?>
+                <?php  if(auth()->user()->hasPermissionTo('view_users')){ ?>
                 return '<a href="{{ route("user.dashboard", ["id" => "/"]) }}/' + row.id + '">' + data + '</a>';
            <?php     } else{?>
             return data;
