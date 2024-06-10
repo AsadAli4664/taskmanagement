@@ -87,10 +87,122 @@
                 </tbody>
             </table>
         </div>
+        <div class="modal fade" id="addTaskModal" tabindex="-1" role="dialog" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addTaskModalLabel">Enter Record</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{{route('task.store')}}" method="POST">
+                        @csrf
+                        <div class="form-group row">
+                            <div class="col-sm-9">
+                            <input type="text" class="form-control" id="crime_no" name="crime_no" dir="rtl" placeholder="00/00" {{ old('crime_no') }} required>
+                            </div>
+                            <label for="crime_no" class="col-sm-3 col-form-label required">مقدمہ معہ تاریخ</label>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-9">
+                            <input type="text" class="form-control" id="crime_section" name="crime_section" placeholder="379 PPC" dir="rtl" required>
+                            </div>
+                            <label for="crime_section" class="col-sm-3 col-form-label required">جرم</label>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-9">
+                            <textarea class="form-control @error('criminal_address') is-invalid @enderror" dir="rtl" rows="3" name="criminal_address" id="txtBox2" placeholder="نام و پتہ ملزمان" required>{{ old('criminal_address') }}</textarea>
+                            </div>
+                            <label for="criminal_address" class="col-sm-3 col-form-label required">  نام و پتہ ملزمان</label>
+                        </div>
+                  
+                        <div class="form-group row">
+                            <div class="col-sm-9">
+                            <input type="date" class="form-control" id="arrest_date"  name="arrest_date" dir="rtl" placeholder="date" required>
+                            </div>
+                            <label for="arrest_date" class="col-sm-3 col-form-label required">تاریخ گرفتاری  </label>
+                        </div>
+                        <div class="form-group row">
+                        <div class="col-sm-5">
+                            <select name="days" dir="rtl" class="form-control" required>
+                              
+                                <option value="دن">دن</option>
+                                <option value="یوم">یوم</option>
+                                <option value="ہفتہ">ہفتہ</option>
+                                <option value="مہینہ">مہینہ</option>
+                                <option value="سال">سال</option>
+                               
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                            <input type="text" class="form-control" id="remand" name="remand" placeholder="2" dir="rtl" required>
+                            </div>
+                          
+                            <label for="remand" class="col-sm-3 col-form-label required">جسمانی ریمانڈ  </label>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-9">
+                            <input type="text" class="form-control" id="arrest_status" name="arrest_status" placeholder="گرفتار" dir="rtl" required>
+                            </div>
+                            <label for="arrest_status" class="col-sm-3 col-form-label required">پوزیشن ملزمان</label>
+                        </div>
+                        <div class="form-group row">
+                        <div class="col-sm-4">
+                          
+                            <select name="designation" class="form-control" required>
+
+                                    <option value="">عہدہ</option>
+                                    <option value="ASI">ASI</option>
+                                    <option value="TASI">TASI</option>
+                                    <option value="SI">SI</option>
+                                    <option value="TSI">TSI</option>
+                                    <option value="Inspector">Inspector</option>
+                                    <option value="DSP">DSP</option>
+                               
+                                </select>
+                            </div>
+                            <div class="col-sm-5">
+                            <input type="text" class="form-control " id="arrest_by" name="arrest_by" placeholder="آفیسر کا نام" dir="rtl" required>
+                            </div>
+                           
+                            <label for="arrest_by" class="col-sm-3 col-form-label required">آفیسر گرفتار کنندہ </label>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-9">
+                            <input type="text" class="form-control" id="condition" name="condition" placeholder="کیفیت" dir="rtl" required>
+                            </div>
+                            <label for="condition" class="col-sm-3 col-form-label required"> کیفیت</label>
+                        </div>
+                     
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" >Add </button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
 @section('script')
+
+<script>
+
+    window.onload = function() {
+        MakeTextBoxUrduEnabled(document.getElementById('txtBox2'));//enable Urdu in textarea
+        MakeTextBoxUrduEnabled(document.getElementById('arrest_status'));//enable Urdu in textarea
+        MakeTextBoxUrduEnabled(document.getElementById('arrest_by'));//enable Urdu in textarea
+        MakeTextBoxUrduEnabled(document.getElementById('condition'));//enable Urdu in textarea
+        MakeTextBoxUrduEnabled(document.getElementById('inputBox'));//enable Urdu in input field
+    };
+
+</script>
 
 <script>
     
